@@ -293,6 +293,7 @@ sed -e "s:^FC[ ]*=.*:FC\:=$FC:" \
 -e "s/^CMT[ ]*=.*/CMT:=$CMT/" \
 -e "s/^NEKNEK[ ]*=.*/NEKNEK:=$NEKNEK/" \
 -e "s/^VISIT[ ]*=.*/VISIT:=${VISIT}/" \
+-e "s/^PARAVIEW[ ]*=.*/PARAVIEW:=${PARAVIEW}/" \
 -e "s:^USR[ ]*=.*:USR\:=$USR:" \
 -e "s:^USR_LFLAGS[ ]*=.*:USR_LFLAGS\:=$USR_LFLAGS:" \
 -e "s:^S[ ]*=.*:S\:=${SOURCE_ROOT}/core:" \
@@ -325,6 +326,34 @@ if [ $VISIT -ne 0 ]; then
   mv .makefile.tmp .makefile
   echo ""
 fi
+
+if [ $PARAVIEW -ne 0 ]; then
+  echo ""
+  echo "Activate VisIt Sim Mode"
+
+  if [ -z "$PARAVIEW_INC" ]; then
+    PARAVIEW_INC=${PARAVIEW_INSTALL}/VTK/Common/
+  fi
+  echo "  PARAVIEW_INC = ($PARAVIEW_INC)"
+  if [ -z "$PARAVIEW_LIB" ]; then
+    PARAVIEW_LIB=${PARAVIEW_INSTALL}/lib
+  fi
+  echo "  PARAVIEW_LIB = ($PARAVIEW_LIB)"
+  if [ -n "$PARAVIEW_STOP" ]; then
+    PARAVIEW_STOP="PARAVIEW_STOP"
+    echo "  PARAVIEW_STOP is defined. Nek5000 will wait for VisIt to Connect."
+  fi
+
+  sed -e "s/^PARAVIEW[ ]*=.*/PARAVIEW:=${PARAVIEW}/" \
+      -e "s:^PARAVIEW_IFLAGS[ ]*=.*:PARAVIEW_IFLAGS\:=-I${PARAVIEW_INC}:" \
+      -e "s:^PARAVIEW_LFLAGS[ ]*=.*:PARAVIEW_LFLAGS\:=-L${PARAVIEW_LIB} -lsimV2 -lsimV2f -ldl -lstdc++:" \
+      -e "s/^PPS[ ]*=.*/PPS=${PPLIST} PARAVIEW ${PARAVIEW_STOP}/" \
+      .makefile > .makefile.tmp
+
+  mv .makefile.tmp .makefile
+  echo ""
+fi
+
 
 if [ "$USR" != "" ]; then
   echo "###########################################################" >> makefile

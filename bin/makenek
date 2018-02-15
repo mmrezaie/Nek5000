@@ -43,6 +43,10 @@
 #VISIT_INSTALL="/path/to/visit/current/linux-x86_64/"
 #VISIT_STOP=true
 
+# ParaView in situ (default 0)
+#PARAVIEW=1
+#PARAVIEW_INSTALL="/path/to/paraview/build"
+
 
 ###############################################################################
 # DONT'T TOUCH WHAT FOLLOWS !!!
